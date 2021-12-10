@@ -1,38 +1,32 @@
 <?php
-/**
- * Verifies that control statements conform to their coding standards.
- *
- * PHP version 5
- *
- * @category  PHP
- * @package   PHP_CodeSniffer
- * @author    Greg Sherwood <gsherwood@squiz.net>
- * @copyright 2006-2014 Allman Pty Ltd (ABN 77 084 670 600)
- * @license   https://github.com/squizlabs/PHP_CodeSniffer/blob/master/licence.txt BSD Licence
- * @link      http://pear.php.net/package/PHP_CodeSniffer
- */
+
+namespace AllmanCodingStandard\Sniffs\ControlStructures;
+
+use PHP_CodeSniffer\Files\File;
+use PHP_CodeSniffer\Sniffs\Sniff;
+use PHP_CodeSniffer\Util\Tokens;
 
 /**
  * Verifies that control statements conform to their coding standards.
  */
-class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeSniffer_Sniff
+class ControlSignatureSniff implements Sniff
 {
-
 	/**
 	 * A list of tokenizers this sniff supports.
 	 *
 	 * @var array
 	 */
-	public $supportedTokenizers = array('PHP', 'JS');
+	public $supportedTokenizers = [
+		'PHP',
+		'JS',
+	];
 
 	/**
-	 * Returns an array of tokens this test wants to listen for.
-	 *
-	 * @return int[]
+	 * @return array<int, (int|string)>
 	 */
-	public function register()
+	public function register(): array
 	{
-		return array(
+		return [
 			T_TRY,
 			T_CATCH,
 			T_DO,
@@ -43,19 +37,15 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 			T_ELSE,
 			T_ELSEIF,
 			T_SWITCH,
-		);
+		];
 	}
 
 	/**
-	 * Processes this test, when one of its tokens is encountered.
-	 *
-	 * @param PHP_CodeSniffer_File $phpcsFile The file being scanned.
-	 * @param int                  $stackPtr  The position of the current token in the
-	 *                                        stack passed in $tokens.
-	 *
-	 * @return void
+	 * @phpcsSuppress SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint
+	 * @param File $phpcsFile
+	 * @param int $newPointer
 	 */
-	public function process(PHP_CodeSniffer_File $phpcsFile, $stackPtr)
+	public function process(File $phpcsFile, $stackPtr): void
 	{
 		$tokens = $phpcsFile->getTokens();
 
@@ -82,18 +72,18 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 			}
 		}
 
-		$newline_after = array(
-			T_DO => T_DO,
-			T_ELSE => T_ELSE,
-			T_TRY => T_TRY,
-		);
+		$newline_after = [
+			T_DO	=> T_DO,
+			T_ELSE	=> T_ELSE,
+			T_TRY	=> T_TRY,
+		];
 		if ($found !== 1 && !isset($newline_after[$tokens[$stackPtr]['code']]))
 		{
 			$error = 'Expected 1 space after %s keyword; %s found';
-			$data  = array(
+			$data  = [
 				strtoupper($tokens[$stackPtr]['content']),
 				$found,
-			);
+			];
 
 			$fix = $phpcsFile->addFixableError($error, $stackPtr, 'SpaceAfterKeyword', $data);
 			if ($fix === true)
@@ -115,7 +105,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 				$error = 'Expected a new line after keyword; found "%s"';
 				$found = str_replace($phpcsFile->eolChar, '\n', $tokens[$stackPtr + 1]['content']);
 
-				if ($phpcsFile->addFixableError($error, $stackPtr, 'NewLineAfterKeyword', array($found)))
+				if ($phpcsFile->addFixableError($error, $stackPtr, 'NewLineAfterKeyword', [$found]))
 				{
 					if ($tokens[$stackPtr + 1]['type'] === 'T_WHITESPACE')
 					{
@@ -145,7 +135,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 					if ($tokens_between === 1 && $tokens[$closer + 1]['type'] === 'T_WHITESPACE')
 					{
 						$error = 'Expected “:” after closing parenthesis; found “%s”';
-						$data = array(str_replace($phpcsFile->eolChar, '\n', $content));
+						$data = [str_replace($phpcsFile->eolChar, '\n', $content)];
 
 						if ($phpcsFile->addFixableError($error, $closer + 1, 'ColonAfterCloseParenthesis', $data))
 						{
@@ -167,7 +157,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 					$error = 'Expected a new line after closing parenthesis; found %s';
 					$found = '"'.str_replace($phpcsFile->eolChar, '\n', $content).'"';
 
-					if ($phpcsFile->addFixableError($error, $closer, 'NewLineAfterCloseParenthesis', array($found)))
+					if ($phpcsFile->addFixableError($error, $closer, 'NewLineAfterCloseParenthesis', [$found]))
 					{
 						$phpcsFile->fixer->addContent($closer, "\n");
 					}
@@ -190,7 +180,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 
 				// Skip all empty tokens on the same line as the opener.
 				if ($tokens[$next]['line'] === $tokens[$opener]['line']
-						&& (isset(PHP_CodeSniffer_Tokens::$emptyTokens[$code]) === true
+						&& (isset(Tokens::$emptyTokens[$code]) === true
 						|| $code === T_CLOSE_TAG)
 						)
 				{
@@ -245,7 +235,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 			if ($found !== 0)
 			{
 				$error = 'Expected 0 spaces before semicolon; %s found';
-				$data  = array($found);
+				$data  = [$found];
 				$fix   = $phpcsFile->addFixableError($error, $closer, 'SpaceBeforeSemicolon', $data);
 				if ($fix === true)
 				{
@@ -269,7 +259,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 			$tokens[$stackPtr]['code'] === T_CATCH
 		)
 		{
-			$closer = $phpcsFile->findPrevious(PHP_CodeSniffer_Tokens::$emptyTokens, ($stackPtr - 1), null, true);
+			$closer = $phpcsFile->findPrevious(Tokens::$emptyTokens, ($stackPtr - 1), null, true);
 			if ($closer === false || $tokens[$closer]['code'] !== T_CLOSE_CURLY_BRACKET)
 			{
 				return;
@@ -301,7 +291,7 @@ class Allman_Sniffs_ControlStructures_ControlSignatureSniff implements PHP_CodeS
 		if ($found !== 'newline')
 		{
 			$error = 'Expected a newline after closing brace; %s found';
-			$data  = array($found);
+			$data  = [$found];
 			$fix   = $phpcsFile->addFixableError($error, $closer, 'NewlineAfterCloseBrace', $data);
 			if ($fix === true)
 			{

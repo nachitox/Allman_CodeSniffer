@@ -1,7 +1,7 @@
 {
     "name": "linnk/allman-codesniffer",
     "description": "Allman CodeSniffer & Linnk Standards",
-    "type": "library",
+    "type": "phpcodesniffer-standard",
     "keywords": ["framework", "codesniffer"],
     "homepage": "http://lionwriter.com",
     "license": "MIT",
@@ -12,6 +12,13 @@
         }
     ],
     "require": {
-        "squizlabs/php_codesniffer": "2.6.2"
+        "php": "^7.1 || ^8.0",
+        "dealerdirect/phpcodesniffer-composer-installer": "^0.6.2 || ^0.7",
+        "squizlabs/php_codesniffer": "^3.6.1"
+    },
+    "autoload": {
+        "psr-4": {
+            "AllmanCodingStandard\\": "AllmanCodingStandard"
+        }
     }
 }
